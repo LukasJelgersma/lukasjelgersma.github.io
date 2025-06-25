@@ -1,0 +1,132 @@
+// Flexbox mixins
+@mixin flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@mixin flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+@mixin flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+@mixin flex-column-center {
+    @include flex-column;
+    align-items: center;
+    justify-content: center;
+}
+
+// Media query mixins
+@mixin mobile {
+    @media (max-width: #{$breakpoint-sm - 1px}) {
+        @content;
+    }
+}
+
+@mixin tablet {
+    @media (max-width: #{$breakpoint-md - 1px}) {
+        @content;
+    }
+}
+
+@mixin desktop {
+    @media (min-width: $breakpoint-md) {
+        @content;
+    }
+}
+
+@mixin large-desktop {
+    @media (min-width: $breakpoint-lg) {
+        @content;
+    }
+}
+
+// Animation mixins
+@mixin fade-in($duration: $transition-fade) {
+    opacity: 0;
+    animation: fadeIn $duration ease-in-out forwards;
+}
+
+@mixin fade-out($duration: $transition-fade) {
+    opacity: 1;
+    animation: fadeOut $duration ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+// Hover effects
+@mixin hover-lift {
+    transition: transform $transition-normal, box-shadow $transition-normal;
+
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: $shadow-lg;
+    }
+}
+
+// Text mixins
+@mixin text-gradient {
+    background: $gradient-primary;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+@mixin heading-style($size: $font-2xl) {
+    font-size: $size;
+    font-weight: $font-bold;
+    line-height: 1.2;
+    margin-bottom: $spacing-md;
+}
+
+// Card mixins
+@mixin card {
+    background: $bg-card;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-md;
+    padding: $spacing-lg;
+}
+
+@mixin button-primary {
+    background: $gradient-primary;
+    color: $white;
+    border: none;
+    border-radius: $radius-md;
+    padding: $spacing-sm $spacing-lg;
+    font-weight: $font-medium;
+    cursor: pointer;
+    transition: transform $transition-fast, box-shadow $transition-fast;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: $shadow-md;
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+}

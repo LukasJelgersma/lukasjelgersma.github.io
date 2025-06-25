@@ -1,0 +1,33 @@
+.app-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.page-transition {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: opacity 1s ease-in-out;
+}
+
+.loading-page-container {
+  opacity: 1;
+  z-index: 2;
+}
+
+.loading-page-container.fade-out {
+  opacity: 0;
+}
+
+.main-page-container {
+  opacity: 0;
+  z-index: 1;
+}
+
+.main-page-container.fade-in {
+  opacity: 1;
+}

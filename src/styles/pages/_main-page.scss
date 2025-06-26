@@ -33,8 +33,11 @@
     z-index: 1;
     height: 100vh;
     overflow-y: auto;
-    background: rgba($bg-primary, 0.7);
-    backdrop-filter: blur(1px);
+    background: rgba($bg-primary, 0.1); // Much more transparent
+    backdrop-filter: blur(0.5px); // Less blur
+    display: flex;
+    flex-direction: column;
+
 
     // Hide scrollbar for different browsers
     scrollbar-width: none;
@@ -49,11 +52,11 @@
 }
 
 .main-header {
-    background: linear-gradient(135deg, rgba($primary, 0.8) 0%, rgba($secondary, 0.8) 100%);
+    background: linear-gradient(135deg, rgba($primary, 0.3) 0%, rgba($secondary, 0.3) 100%); // Much more transparent
     color: $white;
     text-align: center;
     padding: $spacing-2xl $spacing-lg;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(5px); // Less blur
 
     h1 {
         font-size: $font-4xl;
@@ -79,32 +82,104 @@
 
 .about-section,
 .projects-section,
-.contact-section {
+.contact-section,
+.info-section {
     margin-bottom: $spacing-2xl;
     padding: $spacing-lg;
-    // background: rgba($white, 0.85);
+    background: rgba($white, 0.1);
+    border-radius: $radius-lg;
+    backdrop-filter: blur(10px);
+    box-shadow: $shadow-md;
+    transition: all $transition-normal;
+    position: relative;
+    min-height: 200px;
+
+    &.active {
+        background: rgba($white, 0.2);
+        box-shadow: $shadow-lg;
+        transform: scale(1.02);
+        border: 2px solid rgba($primary, 0.3);
+    }
+}
+
+.info-section {
+    .section-number {
+        position: absolute;
+        top: $spacing-sm;
+        right: $spacing-sm;
+        background: $primary;
+        color: $white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: $font-bold;
+        font-size: $font-sm;
+    }
+
+    h2 {
+        color: $white;
+        font-size: $font-2xl;
+        margin-bottom: $spacing-sm;
+    }
+
+    h3 {
+        color: rgba($white, 0.8);
+        font-size: $font-lg;
+        margin-bottom: $spacing-md;
+        font-weight: $font-medium;
+    }
+
+    p {
+        color: rgba($white, 0.9);
+        font-size: $font-md;
+        line-height: 1.6;
+    }
+}
+
+.final-section {
+    margin-bottom: $spacing-2xl;
+    padding: $spacing-xl;
+    background: rgba($primary, 0.1);
     border-radius: $radius-lg;
     backdrop-filter: blur(10px);
     box-shadow: $shadow-lg;
+    text-align: center;
+
+    h2 {
+        color: $white;
+        font-size: $font-2xl;
+        margin-bottom: $spacing-md;
+    }
+
+    p {
+        color: rgba($white, 0.9);
+        font-size: $font-md;
+        line-height: 1.6;
+    }
 }
 
 .about-section h2,
 .projects-section h2,
-.contact-section h2 {
-    @include heading-style($font-3xl);
-    color: $dark-gray;
+.contact-section h2,
+.info-section h2 {
+    @include heading-style($font-2xl);
+    color: $white;
     text-align: center;
     margin-bottom: $spacing-md;
 }
 
 .about-section p,
-.contact-section p {
+.contact-section p,
+.info-section p {
     font-size: $font-md;
     line-height: 1.6;
     text-align: center;
     max-width: 600px;
     margin: 0 auto;
-    color: $text-primary;
+    color: rgba($white, 0.9);
 }
 
 .projects-grid {
@@ -139,6 +214,99 @@
     }
 }
 
+// Information Card Overlay
+.information-card-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    pointer-events: none;
+    animation: fadeInScale 0.5s ease-out;
+}
+
+.information-card {
+    background: rgba($white, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: $radius-xl;
+    padding: $spacing-xl;
+    box-shadow: $shadow-lg;
+    text-align: center;
+    max-width: 400px;
+    border: 2px solid rgba($primary, 0.3);
+
+    h2 {
+        color: $primary;
+        font-size: $font-2xl;
+        margin-bottom: $spacing-sm;
+        font-weight: $font-bold;
+    }
+
+    h3 {
+        color: $secondary;
+        font-size: $font-lg;
+        margin-bottom: $spacing-md;
+        font-weight: $font-medium;
+        opacity: 0.8;
+    }
+
+    p {
+        color: $text-primary;
+        font-size: $font-md;
+        line-height: 1.6;
+        margin-bottom: $spacing-md;
+    }
+
+    .card-indicator {
+        color: $gray;
+        font-size: $font-sm;
+        font-weight: $font-medium;
+        opacity: 0.7;
+    }
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+// Scroll instruction
+.scroll-instruction {
+    margin-top: $spacing-lg;
+
+    p {
+        font-size: $font-sm;
+        opacity: 0.7;
+        animation: bounce 2s infinite;
+    }
+}
+
+@keyframes bounce {
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-10px);
+    }
+
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
 @include tablet {
     .main-header {
         padding: $spacing-xl $spacing-sm;
@@ -159,8 +327,30 @@
 
     .about-section,
     .projects-section,
-    .contact-section {
+    .contact-section,
+    .info-section {
         padding: $spacing-md;
         margin-bottom: $spacing-lg;
+    }
+
+    .information-card {
+        max-width: 300px;
+        padding: $spacing-lg;
+
+        h2 {
+            font-size: $font-xl;
+        }
+
+        h3 {
+            font-size: $font-md;
+        }
+
+        p {
+            font-size: $font-sm;
+        }
+    }
+
+    .final-section {
+        padding: $spacing-lg;
     }
 }

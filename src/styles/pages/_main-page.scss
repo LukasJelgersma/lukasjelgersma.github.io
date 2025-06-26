@@ -2,26 +2,70 @@
 @import '../abstracts/mixins';
 
 .main-page {
+    position: relative;
     min-height: 100vh;
-    background: $bg-primary;
-    color: $text-primary;
+    overflow: hidden;
+}
+
+// Three.js Background
+.three-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    pointer-events: none;
+
+    canvas {
+        display: block !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+    }
+}
+
+// Main content wrapper
+.main-page-content {
+    position: relative;
+    z-index: 1;
+    height: 100vh;
+    overflow-y: auto;
+    background: rgba($bg-primary, 0.7);
+    backdrop-filter: blur(1px);
+
+    // Hide scrollbar for different browsers
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* Internet Explorer 10+ */
+
+    &::-webkit-scrollbar {
+        display: none;
+        /* Safari and Chrome */
+    }
 }
 
 .main-header {
-    background: $gradient-primary;
+    background: linear-gradient(135deg, rgba($primary, 0.8) 0%, rgba($secondary, 0.8) 100%);
     color: $white;
     text-align: center;
     padding: $spacing-2xl $spacing-lg;
+    backdrop-filter: blur(10px);
 
     h1 {
         font-size: $font-4xl;
         margin-bottom: $spacing-sm;
         font-weight: $font-bold;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
 
     p {
         font-size: $font-lg;
-        opacity: 0.9;
+        opacity: 0.95;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     }
 }
 
@@ -29,12 +73,19 @@
     max-width: $breakpoint-xl;
     margin: 0 auto;
     padding: $spacing-2xl $spacing-lg;
+    // Add padding bottom to ensure content doesn't get cut off
+    padding-bottom: $spacing-2xl;
 }
 
 .about-section,
 .projects-section,
 .contact-section {
     margin-bottom: $spacing-2xl;
+    padding: $spacing-lg;
+    // background: rgba($white, 0.85);
+    border-radius: $radius-lg;
+    backdrop-filter: blur(10px);
+    box-shadow: $shadow-lg;
 }
 
 .about-section h2,
@@ -53,6 +104,7 @@
     text-align: center;
     max-width: 600px;
     margin: 0 auto;
+    color: $text-primary;
 }
 
 .projects-grid {
@@ -63,8 +115,17 @@
 }
 
 .project-card {
-    @include card;
-    @include hover-lift;
+    background: rgba($white, 0.9);
+    padding: $spacing-lg;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-md;
+    backdrop-filter: blur(10px);
+    transition: transform $transition-normal, box-shadow $transition-normal;
+
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: $shadow-lg;
+    }
 
     h3 {
         font-size: $font-xl;
@@ -89,9 +150,17 @@
 
     .main-content {
         padding: $spacing-lg $spacing-sm;
+        padding-bottom: $spacing-xl;
     }
 
     .projects-grid {
         grid-template-columns: 1fr;
+    }
+
+    .about-section,
+    .projects-section,
+    .contact-section {
+        padding: $spacing-md;
+        margin-bottom: $spacing-lg;
     }
 }

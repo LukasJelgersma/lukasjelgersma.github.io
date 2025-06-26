@@ -12,19 +12,19 @@ const informationCards = [
     {
         id: 1,
         title: "Skills",
-        subtitle: "Technical Expertise",
+        subtitle: "Yeah I have some",
         description: "Loremu ipsum"
     },
     {
         id: 2,
         title: "Projects",
-        subtitle: "Recent Work",
+        subtitle: "Got some aswell",
         description: "Lorem Ipsum"
     },
     {
         id: 3,
         title: "Contact",
-        subtitle: "Get In Touch",
+        subtitle: "Hit me up",
         description: "Lorem Ipsum"
     }
 ];
@@ -44,10 +44,10 @@ function MainPage() {
             {/* Main Content */}
             <div className="main-page-content">
                 <header className="main-header">
-                    <h1>Welcome to Lukas Jelgersma's Portfolio</h1>
-                    <p>Software Developer & Tech Enthusiast</p>
+                    <h1>Welcome to my Portfolio</h1>
+                    <p>Software Developer & Funny guy</p>
                     <div className="scroll-instruction">
-                        <p>↓ Scroll to explore ↓</p>
+                        <p>↓ Scroll to see more ↓</p>
                     </div>
                 </header>
 
@@ -64,7 +64,7 @@ function MainPage() {
 
                     <section className="final-section">
                         <h2>Thank You</h2>
-                        <p>Thanks for exploring my portfolio! Feel free to reach out for collaborations or opportunities.</p>
+                        <p>Thanks for exploring my portfolio!</p>
                     </section>
                 </main>
             </div>

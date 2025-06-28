@@ -44,6 +44,50 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange
         setDebugParams(prev => ({ ...prev, [key]: value }));
     };
 
+    const spaceTexture = new THREE.TextureLoader().load('src/assets/images/2k_stars_milky_way.jpg');
+    spaceTexture.colorSpace = THREE.SRGBColorSpace;
+
+    const addTextToScene = (x: number, y: number, z: number, text: string, scene: THREE.Scene) => {
+        // Create canvas for text
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d')!;
+
+        // Set canvas size
+        canvas.width = 512;
+        canvas.height = 128;
+
+        // Configure text style
+        context.font = '32px Arial';
+        context.fillStyle = 'white';
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+
+        // Draw text on canvas
+        context.fillText(text, canvas.width / 2, canvas.height / 2);
+
+        // Create texture from canvas
+        const texture = new THREE.CanvasTexture(canvas);
+
+        // Create material with transparent background
+        const material = new THREE.MeshBasicMaterial({
+            map: texture,
+            transparent: true,
+            alphaTest: 0.1
+        });
+
+        // Create plane geometry for the text
+        const geometry = new THREE.PlaneGeometry(4, 1);
+        const textMesh = new THREE.Mesh(geometry, material);
+
+        // Position the text
+        textMesh.position.set(x, y, z);
+
+        // Add to scene
+        scene.add(textMesh);
+
+        return textMesh;
+    };
+
     // Initialize Three.js scene - called once when component mounts
     const initializeScene = useCallback(() => {
         if (sceneRef.current.initialized || !mountRef.current) return;
@@ -55,7 +99,9 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
 
-        renderer.setClearColor(0x000000, 0);
+        // Make background space
+        scene.background = spaceTexture;
+
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
 
@@ -67,10 +113,10 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange
 
         // Add background objects
         for (let i = 0; i < 200; i++) {
-            const geometry = new THREE.SphereGeometry(0.25);
+            const geometry = new THREE.SphereGeometry(1);
             const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
             const object = new THREE.Mesh(geometry, material);
-            const [x, y, z] = Array(3).fill(0).map(() => THREE.MathUtils.randFloatSpread(100));
+            const [x, y, z] = Array(3).fill(0).map(() => THREE.MathUtils.randFloatSpread(1000));
             object.position.set(x, y, z);
             scene.add(object);
         }
@@ -94,6 +140,10 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange
 
             scene.add(cube);
             cubes.push(cube);
+
+            addTextToScene(randomX - 3, randomY + 1, -index * debugParams.cubeSpacing, data.title, scene);
+            addTextToScene(randomX - 3, randomY, -index * debugParams.cubeSpacing, data.subtitle, scene);
+
         });
 
         // Set initial camera position

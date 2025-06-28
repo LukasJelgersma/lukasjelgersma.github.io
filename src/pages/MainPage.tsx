@@ -43,13 +43,17 @@ function MainPage() {
 
             {/* Main Content */}
             <div className="main-page-content">
-                <header className="main-header">
+                {/* <header className="main-header">
                     <h1>Welcome to my Portfolio</h1>
                     <p>Software Developer & Funny guy</p>
                     <div className="scroll-instruction">
                         <p>↓ Scroll to see more ↓</p>
                     </div>
-                </header>
+                </header> */}
+
+                <div className="scroll-instruction" style={{ textAlign: 'center', marginTop: '20px' }}>
+                    <p>↓ Scroll to see more ↓</p>
+                </div>
 
                 <main className="main-content">
                     {/* Generate sections based on information cards */}

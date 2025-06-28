@@ -14,7 +14,7 @@ function App() {
       setTimeout(() => {
         setShowMainPage(true)
       }, 100)
-    }, 0) // 3 seconds loading time
+    }, 3000) // 3 seconds loading time
 
     return () => clearTimeout(timer)
   }, [])

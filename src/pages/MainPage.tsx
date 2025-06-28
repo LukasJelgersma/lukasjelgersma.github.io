@@ -58,18 +58,15 @@ function MainPage() {
                 <main className="main-content">
                     {/* Generate sections based on information cards */}
                     {informationCards.map((card, index) => (
-                        <section key={card.id} className={`info-section ${index === activeCardIndex ? 'active' : ''}`} style={{ visibility: 'hidden' }}>
-                            <div className="section-number">{index + 1}</div>
-                            <h2>{card.title}</h2>
-                            <h3>{card.subtitle}</h3>
-                            <p>{card.description}</p>
-                        </section>
+                        <>
+                            <section key={card.id} className={`info-section ${index === activeCardIndex ? 'active' : ''}`} style={{ visibility: 'hidden' }}>
+                                <div className="section-number">{index + 1}</div>
+                                <h2>{card.title}</h2>
+                                <h3>{card.subtitle}</h3>
+                                <p>{card.description}</p>
+                            </section>
+                        </>
                     ))}
-
-                    <section className="final-section">
-                        <h2>Thank You</h2>
-                        <p>Thanks for exploring my portfolio!</p>
-                    </section>
                 </main>
             </div>
         </div>

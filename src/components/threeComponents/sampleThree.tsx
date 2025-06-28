@@ -15,6 +15,7 @@ const cubeData = [
     { title: "Contact", subtitle: "Hit me up", color: 0x535bf2 }
 ];
 
+
 const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange }) => {
     const mountRef = useRef<HTMLDivElement | null>(null);
     const sceneRef = useRef<{
@@ -30,7 +31,7 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange
     // Debug state
     const [isDebugVisible, setIsDebugVisible] = useState(false);
     const [debugParams, setDebugParams] = useState({
-        cubeSpacing: 8,
+        cubeSpacing: 30,
         cameraSpeed: 0.1,
         rotationSpeed: 0.01
     });
@@ -44,8 +45,29 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange
         setDebugParams(prev => ({ ...prev, [key]: value }));
     };
 
-    const spaceTexture = new THREE.TextureLoader().load('/2k_stars_milky_way.jpg');
+    const spaceTexture = new THREE.TextureLoader().load('/textures/8k_stars.jpg');
     spaceTexture.colorSpace = THREE.SRGBColorSpace;
+    spaceTexture.wrapS = THREE.RepeatWrapping;
+    spaceTexture.wrapT = THREE.RepeatWrapping;
+
+    const createSpaceOrb = (scene: THREE.Scene, camera: THREE.PerspectiveCamera) => {
+        // Create a large sphere that surrounds the entire scene
+        const sphereGeometry = new THREE.SphereGeometry(800, 64, 32);
+
+        // Create material with the space texture on the inside
+        const sphereMaterial = new THREE.MeshBasicMaterial({
+            map: spaceTexture,
+            side: THREE.BackSide, // This makes the texture visible from inside
+            transparent: false,
+            opacity: 1
+        });
+
+        const spaceOrb = new THREE.Mesh(sphereGeometry, sphereMaterial);
+        spaceOrb.position.set(0, 0, 0);
+
+        scene.add(spaceOrb);
+        return spaceOrb;
+    };
 
     const addTextToScene = (x: number, y: number, z: number, text: string, scene: THREE.Scene) => {
         // Create canvas for text
@@ -99,9 +121,6 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
 
-        // Make background space
-        scene.background = spaceTexture;
-
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
 
@@ -111,13 +130,17 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange
         }
         mountRef.current.appendChild(renderer.domElement);
 
+        // Create space background
+        createSpaceOrb(scene, camera);
+
         // Add background objects
         for (let i = 0; i < 200; i++) {
-            const geometry = new THREE.SphereGeometry(1);
-            const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const geometry = new THREE.OctahedronGeometry(2, 1);
+            const material = new THREE.MeshBasicMaterial({ color: 0x535bf2, transparent: true, opacity: 0.5, wireframe: true });
             const object = new THREE.Mesh(geometry, material);
             const [x, y, z] = Array(3).fill(0).map(() => THREE.MathUtils.randFloatSpread(1000));
             object.position.set(x, y, z);
+
             scene.add(object);
         }
 
@@ -133,8 +156,8 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange
             });
 
             const cube = new THREE.Mesh(geometry, material);
-            const randomX = THREE.MathUtils.randFloatSpread(20);
-            const randomY = THREE.MathUtils.randFloatSpread(20);
+            const randomX = THREE.MathUtils.randFloatSpread(100);
+            const randomY = THREE.MathUtils.randFloatSpread(100);
             cube.position.set(randomX, randomY, -index * debugParams.cubeSpacing);
             cube.userData = { index, originalZ: -index * debugParams.cubeSpacing };
 
@@ -167,7 +190,7 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange
             if (scrollElement && sceneRef.current.camera && sceneRef.current.cubes) {
                 const scrollPosition = scrollElement.scrollTop;
                 const maxScroll = scrollElement.scrollHeight - scrollElement.clientHeight;
-                const normalizedScroll = Math.min(scrollPosition / maxScroll, 1);
+                const normalizedScroll = Math.min(Math.max(scrollPosition / maxScroll, 0), 1);
 
                 // Calculate active cube index
                 const progress = normalizedScroll * (cubeData.length - 1);
@@ -216,10 +239,10 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange
     // Window resize handler
     const handleResize = useCallback(() => {
         if (!sceneRef.current.camera || !sceneRef.current.renderer) return;
-
         sceneRef.current.camera.aspect = window.innerWidth / window.innerHeight;
         sceneRef.current.camera.updateProjectionMatrix();
         sceneRef.current.renderer.setSize(window.innerWidth, window.innerHeight);
+
     }, []);
 
     // Cleanup function

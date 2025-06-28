@@ -1,13 +1,9 @@
 import React, { useState } from 'react';
 
 interface DebugParams {
-    spacing: number;
-    baseMovementMultiplier: number;
-    forwardBoost: number;
-    transitionSpeed: number;
-    scaleBoost: number;
-    targetPosition: number;
-    maxForwardPosition: number;
+    cubeSpacing: number;
+    cameraSpeed: number;
+    rotationSpeed: number;
 }
 
 interface DebugPanelProps {
@@ -18,9 +14,8 @@ interface DebugPanelProps {
     scrollInfo: {
         normalizedScroll: number;
         activeIndex: number;
-        progressWithinCube: number;
     };
-    cubePositions: Array<{ z: number; scale: number; isActive: boolean }>;
+    cubePositions: Array<{ z: number; isActive: boolean }>;
 }
 
 const DebugPanel: React.FC<DebugPanelProps> = ({
@@ -34,13 +29,9 @@ const DebugPanel: React.FC<DebugPanelProps> = ({
     const [isCollapsed, setIsCollapsed] = useState(false);
 
     const resetToDefaults = () => {
-        onParamChange('spacing', 7);
-        onParamChange('baseMovementMultiplier', 4);
-        onParamChange('forwardBoost', 3);
-        onParamChange('transitionSpeed', 0.1);
-        onParamChange('scaleBoost', 0.3);
-        onParamChange('targetPosition', 2);
-        onParamChange('maxForwardPosition', 8);
+        onParamChange('cubeSpacing', 8);
+        onParamChange('cameraSpeed', 0.1);
+        onParamChange('rotationSpeed', 0.01);
     };
 
     if (!isVisible) {
@@ -115,11 +106,11 @@ const DebugPanel: React.FC<DebugPanelProps> = ({
                     }
                 }
             `}</style>
-            
-            <div style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center', 
+
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
                 marginBottom: '15px',
                 borderBottom: '1px solid #444',
                 paddingBottom: '10px'
@@ -165,23 +156,22 @@ const DebugPanel: React.FC<DebugPanelProps> = ({
                 <>
                     <div style={{ marginBottom: '15px' }}>
                         <div style={{ color: '#FFF', fontWeight: 'bold', marginBottom: '5px' }}>
-                            DATA:
+                            SCROLL DATA:
                         </div>
                         <div style={{ color: '#AAA', marginLeft: '10px', fontSize: '10px' }}>
-                            Scroll: {scrollInfo.normalizedScroll.toFixed(3)} | 
-                            Section: {scrollInfo.activeIndex} | 
-                            Progress: {scrollInfo.progressWithinCube.toFixed(3)}
+                            Scroll: {scrollInfo.normalizedScroll.toFixed(3)} |
+                            Active Cube: {scrollInfo.activeIndex}
                         </div>
                     </div>
 
                     <div style={{ marginBottom: '15px' }}>
                         <div style={{ color: '#FFF', fontWeight: 'bold', marginBottom: '5px' }}>
-                            CUBE STATS:
+                            CUBE POSITIONS:
                         </div>
                         <div style={{ color: '#AAA', marginLeft: '10px', fontSize: '10px' }}>
                             {cubePositions.map((cube, i) => (
                                 <div key={i} style={{ color: cube.isActive ? '#4CAF50' : '#AAA' }}>
-                                    Cube {i}: z={cube.z.toFixed(2)} scale={cube.scale.toFixed(2)} 
+                                    Cube {i}: z={cube.z.toFixed(2)}
                                     {cube.isActive && ' ← ACTIVE'}
                                 </div>
                             ))}
@@ -189,56 +179,61 @@ const DebugPanel: React.FC<DebugPanelProps> = ({
                     </div>
 
                     <div style={{ color: '#FF9800', fontWeight: 'bold', marginBottom: '10px' }}>
-                        TUNING:
+                        PARAMETERS:
                     </div>
 
                     {Object.entries(debugParams).map(([key, value]) => {
                         const configs = {
-                            spacing: { min: 3, max: 12, step: 0.5, label: 'Spacing' },
-                            baseMovementMultiplier: { min: 1, max: 8, step: 0.2, label: 'Base Movement' },
-                            forwardBoost: { min: 0, max: 6, step: 0.1, label: 'Forward Boost' },
-                            transitionSpeed: { min: 0.01, max: 0.5, step: 0.01, label: 'Transition Speed' },
-                            scaleBoost: { min: 0, max: 1, step: 0.05, label: 'Scale Boost' },
-                            targetPosition: { min: -2, max: 5, step: 0.1, label: 'Target Position' },
-                            maxForwardPosition: { min: 4, max: 15, step: 0.5, label: 'Max Forward' }
+                            cubeSpacing: { min: 4, max: 15, step: 0.5, label: 'Cube Spacing' },
+                            cameraSpeed: { min: 0.01, max: 0.5, step: 0.01, label: 'Camera Speed' },
+                            rotationSpeed: { min: 0.001, max: 0.05, step: 0.001, label: 'Rotation Speed' }
                         };
 
                         const config = configs[key as keyof typeof configs];
-                        
+
                         return (
                             <div key={key} style={{ marginBottom: '8px' }}>
-                                <label style={{ 
-                                    display: 'block', 
-                                    marginBottom: '3px',
-                                    fontSize: '10px',
-                                    color: '#ddd'
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    marginBottom: '3px'
                                 }}>
-                                    {config.label}: <span style={{ color: '#4CAF50', fontWeight: 'bold' }}>
-                                        {value}
+                                    <span style={{ color: '#DDD', fontSize: '10px' }}>
+                                        {config.label}:
                                     </span>
-                                </label>
+                                    <span style={{
+                                        color: '#4CAF50',
+                                        fontSize: '10px',
+                                        fontWeight: 'bold',
+                                        minWidth: '50px',
+                                        textAlign: 'right'
+                                    }}>
+                                        {value.toFixed(3)}
+                                    </span>
+                                </div>
                                 <input
                                     type="range"
                                     min={config.min}
                                     max={config.max}
                                     step={config.step}
                                     value={value}
-                                    onChange={(e) => onParamChange(key as keyof DebugParams, parseFloat(e.target.value))}
+                                    onChange={(e) => onParamChange(key as keyof typeof debugParams, parseFloat(e.target.value))}
                                     style={{
                                         width: '100%',
                                         height: '15px',
                                         background: '#333',
                                         outline: 'none',
-                                        borderRadius: '5px'
+                                        borderRadius: '3px'
                                     }}
                                 />
                             </div>
                         );
                     })}
 
-                    <div style={{ 
-                        marginTop: '15px', 
-                        paddingTop: '10px', 
+                    <div style={{
+                        marginTop: '15px',
+                        paddingTop: '10px',
                         borderTop: '1px solid #444',
                         display: 'flex',
                         gap: '8px'
@@ -258,17 +253,18 @@ const DebugPanel: React.FC<DebugPanelProps> = ({
                         >
                             🔄 RESET
                         </button>
-                        <div style={{ 
-                            fontSize: '9px', 
-                            color: '#666', 
+                        <div style={{
+                            fontSize: '9px',
+                            color: '#666',
                             alignSelf: 'center',
                             fontStyle: 'italic'
                         }}>
                         </div>
                     </div>
                 </>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 };
 

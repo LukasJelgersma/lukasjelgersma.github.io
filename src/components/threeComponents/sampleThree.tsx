@@ -44,7 +44,7 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange
         setDebugParams(prev => ({ ...prev, [key]: value }));
     };
 
-    const spaceTexture = new THREE.TextureLoader().load('src/assets/images/2k_stars_milky_way.jpg');
+    const spaceTexture = new THREE.TextureLoader().load('/2k_stars_milky_way.jpg');
     spaceTexture.colorSpace = THREE.SRGBColorSpace;
 
     const addTextToScene = (x: number, y: number, z: number, text: string, scene: THREE.Scene) => {

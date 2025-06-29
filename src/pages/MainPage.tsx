@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import ThreeScene from '../components/threeComponents/sampleThree';
 import { useNavigate } from 'react-router-dom';
+import PageTransition from '../components/PageTransition';
 
 // Define your information cards here - easy to add more!
 const informationCards = [
@@ -58,19 +59,12 @@ function MainPage() {
     }
 
     return (
-        <div className="main-page">
+        <PageTransition className="main-page">
             {/* Three.js Background */}
             <ThreeScene className="three-background" onActiveObjectChange={handleActiveObjectChange} onActiveObjectClick={handleActiveObjectClick} />
 
             {/* Main Content */}
             <div className="main-page-content">
-                {/* <header className="main-header">
-                    <h1>Welcome to my Portfolio</h1>
-                    <p>Software Developer & Funny guy</p>
-                    <div className="scroll-instruction">
-                        <p>↓ Scroll to see more ↓</p>
-                    </div>
-                </header> */}
 
                 <div className="scroll-instruction" style={{ textAlign: 'center', marginTop: '20px' }}>
                     <p>↓ Scroll to see more ↓</p>
@@ -90,7 +84,7 @@ function MainPage() {
                     ))}
                 </main>
             </div>
-        </div>
+        </PageTransition>
     )
 }
 

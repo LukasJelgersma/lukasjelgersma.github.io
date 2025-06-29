@@ -5,6 +5,7 @@ import DebugPanel from './DebugPanel';
 interface ThreeSceneProps {
     className?: string;
     onActiveObjectChange?: (index: number) => void;
+    onActiveObjectClick?: (index: number) => void;
 }
 
 // Cube data - moved outside component to avoid recreation
@@ -16,7 +17,7 @@ const cubeData = [
 ];
 
 
-const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange }) => {
+const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange, onActiveObjectClick }) => {
     const mountRef = useRef<HTMLDivElement | null>(null);
     const sceneRef = useRef<{
         scene?: THREE.Scene;
@@ -26,6 +27,7 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange
         cubes?: THREE.Mesh[];
         initialized?: boolean;
         currentActiveIndex?: number;
+        currentHoveredObject?: THREE.Mesh | null;
     }>({});
 
     // Debug state
@@ -39,6 +41,7 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange
         normalizedScroll: 0,
         activeIndex: 0
     });
+
     const [cubePositions, setCubePositions] = useState<Array<{ z: number; isActive: boolean }>>([]);
 
     const handleDebugParamChange = (key: keyof typeof debugParams, value: number) => {
@@ -50,7 +53,104 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange
     spaceTexture.wrapS = THREE.RepeatWrapping;
     spaceTexture.wrapT = THREE.RepeatWrapping;
 
-    const createSpaceOrb = (scene: THREE.Scene, camera: THREE.PerspectiveCamera) => {
+
+    function onMouseMove(event: MouseEvent, camera: THREE.PerspectiveCamera) {
+        const mouse = new THREE.Vector2();
+        // Normalize mouse coordinates (-1 to +1)
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(mouse, camera);
+
+        // Only test the cube that is currently active
+        const activeIndex = sceneRef.current.currentActiveIndex;
+        const cubes = sceneRef.current.cubes;
+        const activeCube = (typeof activeIndex === 'number' && cubes && activeIndex >= 0 && activeIndex < cubes.length)
+            ? cubes[activeIndex]
+            : undefined;
+
+        if (!activeCube) return;
+
+        const intersects = raycaster.intersectObjects([activeCube]);
+
+
+        if (intersects.length > 0) {
+            const hovered = intersects[0].object as THREE.Mesh;
+
+            if (sceneRef.current.currentHoveredObject !== hovered) {
+                // Reset previous hovered
+                if (sceneRef.current.currentHoveredObject) {
+                    sceneRef.current.currentHoveredObject.scale.setScalar(1);
+                    const prevMaterial = sceneRef.current.currentHoveredObject.material as THREE.MeshStandardMaterial;
+                    prevMaterial.emissive.setHex(0x000000);
+                    prevMaterial.emissiveIntensity = 0;
+                }
+
+                // Set new hovered
+                sceneRef.current.currentHoveredObject = hovered;
+                hovered.scale.setScalar(1.3);
+                document.body.style.cursor = 'pointer';
+
+
+                const index = hovered.userData?.index;
+                const material = hovered.material as THREE.MeshStandardMaterial;
+
+                if (typeof index === 'number' && cubeData[index]) {
+                    material.emissive.setHex(cubeData[index].color);
+                    material.emissiveIntensity = 0.5;
+                    // Make mouse cursor a pointer
+                }
+            }
+        } else {
+            document.body.style.cursor = 'default';
+            if (sceneRef.current.currentHoveredObject) {
+                sceneRef.current.currentHoveredObject.scale.setScalar(1);
+
+                // Remove glow when not hovering
+                const material = sceneRef.current.currentHoveredObject.material as THREE.MeshStandardMaterial;
+                material.emissive.setHex(0x000000);
+                material.emissiveIntensity = 0;
+                sceneRef.current.currentHoveredObject = null;
+
+            }
+        }
+    }
+
+
+    function onMouseClick(event: MouseEvent, camera: THREE.PerspectiveCamera) {
+        const mouse = new THREE.Vector2();
+        // Normalize mouse coordinates (-1 to +1)
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        const raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(mouse, camera);
+
+        // Only test the cube that is currently active
+        const activeIndex = sceneRef.current.currentActiveIndex;
+        const cubes = sceneRef.current.cubes;
+        const activeCube = (typeof activeIndex === 'number' && cubes && activeIndex >= 0 && activeIndex < cubes.length)
+            ? cubes[activeIndex]
+            : undefined;
+
+        if (!activeCube) return;
+
+        const intersects = raycaster.intersectObjects([activeCube]);
+
+        if (intersects.length > 0) {
+            const clickedCube = intersects[0].object as THREE.Mesh;
+            const index = clickedCube.userData?.index;
+
+            if (typeof index === 'number' && cubeData[index]) {
+                if (onActiveObjectClick) {
+                    onActiveObjectClick(index);
+                }
+            }
+        }
+    }
+
+    const createSpaceOrb = (scene: THREE.Scene) => {
         // Create a large sphere that surrounds the entire scene
         const sphereGeometry = new THREE.SphereGeometry(800, 64, 32);
 
@@ -131,28 +231,32 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange
         mountRef.current.appendChild(renderer.domElement);
 
         // Create space background
-        createSpaceOrb(scene, camera);
+        createSpaceOrb(scene);
 
         // Add background objects
-        for (let i = 0; i < 200; i++) {
-            const geometry = new THREE.OctahedronGeometry(2, 1);
-            const material = new THREE.MeshBasicMaterial({ color: 0x535bf2, transparent: true, opacity: 0.5, wireframe: true });
-            const object = new THREE.Mesh(geometry, material);
-            const [x, y, z] = Array(3).fill(0).map(() => THREE.MathUtils.randFloatSpread(1000));
-            object.position.set(x, y, z);
+        // for (let i = 0; i < 200; i++) {
+        //     const geometry = new THREE.OctahedronGeometry(2, 1);
+        //     const material = new THREE.MeshBasicMaterial({ color: 0x535bf2, transparent: true, opacity: 0.5, wireframe: true });
+        //     const object = new THREE.Mesh(geometry, material);
+        //     const [x, y, z] = Array(3).fill(0).map(() => THREE.MathUtils.randFloatSpread(1000));
+        //     object.position.set(x, y, z);
 
-            scene.add(object);
-        }
+        //     scene.add(object);
+        // }
 
         // Create cubes
         const cubes: THREE.Mesh[] = [];
         cubeData.forEach((data, index) => {
             const geometry = new THREE.OctahedronGeometry(2, 1);
-            const material = new THREE.MeshBasicMaterial({
+            const material = new THREE.MeshStandardMaterial({
                 color: data.color,
                 transparent: true,
                 opacity: 1,
-                wireframe: true
+                wireframe: true,
+                envMap: spaceTexture,
+                roughness: 0,
+                metalness: 0.5,
+                emissive: 0x000000
             });
 
             const cube = new THREE.Mesh(geometry, material);
@@ -169,11 +273,20 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange
 
         });
 
+        // Set up lighting
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(5, 5, 5);
+        scene.add(directionalLight);
+
         // Set initial camera position
         camera.position.set(cubes[0].position.x, cubes[0].position.y, 5);
 
         // Store references
         sceneRef.current = { scene, camera, renderer, cubes, initialized: true, currentActiveIndex: -1 };
+
+
+        window.addEventListener('mousemove', (event) => onMouseMove(event, camera));
+        window.addEventListener('click', (event) => onMouseClick(event, camera));
 
         startAnimation();
     }, [debugParams.cubeSpacing]);
@@ -249,6 +362,8 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange
     const cleanup = useCallback(() => {
         sceneRef.current.initialized = false;
         window.removeEventListener('resize', handleResize);
+        window.removeEventListener('mousemove', (event) => onMouseMove(event, sceneRef.current.camera!));
+        window.removeEventListener('click', (event) => onMouseClick(event, sceneRef.current.camera!));
 
         if (sceneRef.current.animationId) {
             cancelAnimationFrame(sceneRef.current.animationId);
@@ -282,7 +397,9 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange
             window.addEventListener('resize', handleResize);
             return cleanup;
         }
+
     }, [initializeScene, handleResize, cleanup]);
+
 
     return (
         <>

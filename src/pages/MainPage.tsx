@@ -36,10 +36,14 @@ function MainPage() {
         setActiveCardIndex(index);
     };
 
+    const handleActiveObjectClick = (index: number) => {
+        console.log(`Clicked on card: ${informationCards[index].title}`);
+    }
+
     return (
         <div className="main-page">
             {/* Three.js Background */}
-            <ThreeScene className="three-background" onActiveObjectChange={handleActiveObjectChange} />
+            <ThreeScene className="three-background" onActiveObjectChange={handleActiveObjectChange} onActiveObjectClick={handleActiveObjectClick} />
 
             {/* Main Content */}
             <div className="main-page-content">

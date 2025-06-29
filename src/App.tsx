@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import LoadingPage from './pages/LoadingPage'
 import MainPage from './pages/MainPage'
+import AboutPage from './pages/AboutPage'
+import SkillsPage from './pages/SkillsPage'
+import ProjectsPage from './pages/ProjectsPage'
+import ContactPage from './pages/ContactPage'
 
 function App() {
   const [isLoading, setIsLoading] = useState(true)
@@ -14,23 +19,31 @@ function App() {
       setTimeout(() => {
         setShowMainPage(true)
       }, 100)
-    }, 3000) // 3 seconds loading time
+    }, 0) // 3 seconds loading time
 
     return () => clearTimeout(timer)
   }, [])
 
   return (
-    <div className="app-container">
-      {!showMainPage && (
-        <div className={`page-transition loading-page-container ${!isLoading ? 'fade-out' : ''}`}>
-          <LoadingPage />
-        </div>
-      )}
+    <Router>
+      <div className="app-container">
+        {!showMainPage && (
+          <div className={`page-transition loading-page-container ${!isLoading ? 'fade-out' : ''}`}>
+            <LoadingPage />
+          </div>
+        )}
 
-      <div className={`page-transition main-page-container ${showMainPage ? 'fade-in' : ''}`}>
-        <MainPage />
+        <div className={`page-transition main-page-container ${showMainPage ? 'fade-in' : ''}`}>
+          <Routes>
+            <Route path="/" element={<MainPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/skills" element={<SkillsPage />} />
+            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+          </Routes>
+        </div>
       </div>
-    </div>
+    </Router>
   )
 }
 

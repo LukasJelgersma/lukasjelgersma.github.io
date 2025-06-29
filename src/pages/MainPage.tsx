@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import ThreeScene from '../components/threeComponents/sampleThree';
+import { useNavigate } from 'react-router-dom';
 
 // Define your information cards here - easy to add more!
 const informationCards = [
@@ -30,6 +31,8 @@ const informationCards = [
 ];
 
 function MainPage() {
+    const navigate = useNavigate();
+
     const [activeCardIndex, setActiveCardIndex] = useState(-1);
 
     const handleActiveObjectChange = (index: number) => {
@@ -37,7 +40,21 @@ function MainPage() {
     };
 
     const handleActiveObjectClick = (index: number) => {
-        console.log(`Clicked on card: ${informationCards[index].title}`);
+        switch (index) {
+            case 0:
+                navigate('/about');
+                break;
+            case 1:
+                navigate('/skills');
+                break;
+            case 2:
+                navigate('/projects');
+                break;
+            case 3:
+                navigate('/contact');
+                break;
+            default:
+        }
     }
 
     return (

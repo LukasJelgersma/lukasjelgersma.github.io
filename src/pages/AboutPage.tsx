@@ -10,6 +10,7 @@ function AboutPage() {
             <h1>About Me</h1>
             <p>Something about me</p>
         </div>
+
     );
 }
 

@@ -233,17 +233,6 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange
         // Create space background
         createSpaceOrb(scene);
 
-        // Add background objects
-        // for (let i = 0; i < 200; i++) {
-        //     const geometry = new THREE.OctahedronGeometry(2, 1);
-        //     const material = new THREE.MeshBasicMaterial({ color: 0x535bf2, transparent: true, opacity: 0.5, wireframe: true });
-        //     const object = new THREE.Mesh(geometry, material);
-        //     const [x, y, z] = Array(3).fill(0).map(() => THREE.MathUtils.randFloatSpread(1000));
-        //     object.position.set(x, y, z);
-
-        //     scene.add(object);
-        // }
-
         // Create cubes
         const cubes: THREE.Mesh[] = [];
         cubeData.forEach((data, index) => {

@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import AboutScene from "../components/aboutScene/AboutScene";
 
 
 function AboutPage() {
@@ -9,7 +10,11 @@ function AboutPage() {
             <button onClick={() => navigate('/')}>Back</button>
             <h1>About Me</h1>
             <p>Something about me</p>
+            <AboutScene />
+
+
         </div>
+
 
     );
 }

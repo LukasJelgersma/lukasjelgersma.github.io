@@ -90,7 +90,6 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange
                 // Set new hovered
                 sceneRef.current.currentHoveredObject = hovered;
                 hovered.scale.setScalar(1.3);
-                document.body.style.cursor = 'pointer';
 
 
                 const index = hovered.userData?.index;
@@ -99,11 +98,9 @@ const ThreeScene: React.FC<ThreeSceneProps> = ({ className, onActiveObjectChange
                 if (typeof index === 'number' && cubeData[index]) {
                     material.emissive.setHex(cubeData[index].color);
                     material.emissiveIntensity = 0.5;
-                    // Make mouse cursor a pointer
                 }
             }
         } else {
-            document.body.style.cursor = 'default';
             if (sceneRef.current.currentHoveredObject) {
                 sceneRef.current.currentHoveredObject.scale.setScalar(1);
 

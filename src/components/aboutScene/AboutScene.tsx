@@ -11,7 +11,7 @@ interface AboutSceneProps {
 const AboutScene: React.FC<AboutSceneProps> = ({ className }) => {
     const mountRef = useRef<HTMLDivElement | null>(null);
 
-    const coolCameraShots = true; // Set to false to disable camera shots
+    const coolCameraShots = true;
 
     const sceneRef = useRef<{
         scene?: THREE.Scene;
@@ -22,7 +22,7 @@ const AboutScene: React.FC<AboutSceneProps> = ({ className }) => {
         initialized?: boolean;
         animationStartTime?: number;
         currentPhase?: 'animating' | 'holding';
-        light?: THREE.DirectionalLight;
+        lights?: THREE.SpotLight[];
     }>({});
 
     const currentShotIndexRef = useRef(0);
@@ -115,15 +115,27 @@ const AboutScene: React.FC<AboutSceneProps> = ({ className }) => {
         }
         mountRef.current.appendChild(renderer.domElement);
 
-        const light = new THREE.DirectionalLight(0xe7b3ff, 1);
-        light.position.set(5, 5, 5);
-        light.castShadow = true;
-        scene.add(light);
+        const lightPositions = [
+            { x: 2, y: 5, z: 5 },
+            { x: -2, y: 5, z: 5 },
+            { x: -2, y: 5, z: -5 },
+            { x: 2, y: 5, z: -5 }
+        ];
 
-        light.shadow.mapSize.width = 1024;
-        light.shadow.mapSize.height = 1024;
-        light.shadow.camera.near = 0.5;
-        light.shadow.camera.far = 500;
+        const lights: THREE.SpotLight[] = [];
+
+        // Create lights
+        lightPositions.forEach(pos => {
+            const light = new THREE.SpotLight(0xe7b3ff, 100);
+            light.position.set(pos.x, pos.y, pos.z);
+            light.castShadow = true;
+            scene.add(light);
+            light.shadow.mapSize.width = 1024;
+            light.shadow.mapSize.height = 1024;
+            light.shadow.camera.near = 0.5;
+            light.shadow.camera.far = 500;
+            lights.push(light);
+        });
 
         // Set initial camera position from first shot
         const controls = new OrbitControls(camera, renderer.domElement);
@@ -136,7 +148,6 @@ const AboutScene: React.FC<AboutSceneProps> = ({ className }) => {
         camera.position.set(firstShot.start.position.x, firstShot.start.position.y, firstShot.start.position.z);
         camera.rotation.set(firstShot.start.rotation.x, firstShot.start.rotation.y, firstShot.start.rotation.z);
 
-
         // Store references
         sceneRef.current = {
             scene,
@@ -146,7 +157,7 @@ const AboutScene: React.FC<AboutSceneProps> = ({ className }) => {
             initialized: true,
             animationStartTime: Date.now(),
             currentPhase: 'animating',
-            light
+            lights
         };
 
         // Load infinite plane
@@ -234,11 +245,8 @@ const AboutScene: React.FC<AboutSceneProps> = ({ className }) => {
                 sceneRef.current.controls?.update();
             }
 
-
             sceneRef.current.animationId = requestAnimationFrame(animate);
 
-
-            // Render the scene
             sceneRef.current.renderer?.render(sceneRef.current.scene, sceneRef.current.camera);
         };
 

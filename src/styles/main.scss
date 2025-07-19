@@ -5,6 +5,10 @@
 // Base
 @import 'base/base';
 
+// Components
+@import 'components/button.scss';
+
 // Pages
 @import 'pages/loading-page';
 @import 'pages/main-page';
+@import 'pages/about-page';
